@@ -68,7 +68,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	flag.Parse()
-	http.HandleFunc("/xyzzy.upload", authWrapperFunc(upload))
+	http.HandleFunc("/-upload", authWrapperFunc(upload))
 	http.Handle("/", authWrapper(http.FileServer(http.Dir(*dirFlag))))
 	http.ListenAndServe(*listenFlag, nil)
 }
