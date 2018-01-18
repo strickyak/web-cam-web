@@ -16,6 +16,10 @@ var uploadFlag = flag.String("upload", "/tmp/xyzzy/image.jpg", "host filename to
 
 func authWrapperFunc(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if *pwFlag == "" {
+			h(w, r)
+			return
+		}
 		user, pass, _ := r.BasicAuth()
 		if user+":"+pass != *pwFlag {
 			w.Header().Set("WWW-Authenticate", `Basic realm="REALM"`)
@@ -29,8 +33,12 @@ func authWrapperFunc(h http.HandlerFunc) http.HandlerFunc {
 
 func authWrapper(h http.Handler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if *pwFlag == "" {
+			h.ServeHTTP(w, r)
+			return
+		}
 		user, pass, _ := r.BasicAuth()
-		if user+pass != "nandothrice" {
+		if user+":"+pass != *pwFlag {
 			w.Header().Set("WWW-Authenticate", `Basic realm="REALM"`)
 			w.WriteHeader(401)
 			w.Write([]byte("401 Unauthorized\n"))
